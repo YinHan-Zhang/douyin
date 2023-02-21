@@ -7,7 +7,10 @@ import (
 	"log"
 
 	usrv "douyin-easy/grpc_gen/user"
+	"douyin-easy/pkg/configs"
 
+	clientv3 "go.etcd.io/etcd/client/v3"
+	etcdResolver "go.etcd.io/etcd/client/v3/naming/resolver"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -28,10 +31,26 @@ func NewClientConnect() *ClientConnect {
 }
 
 func getConnect() *grpc.ClientConn {
-	// 连接grpc服务端
-	conn, err := grpc.Dial("localhost:1234", grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	//注册解析器
+	etcdClient, _ := clientv3.New(clientv3.Config{
+		Endpoints:   []string{configs.EtcdURL},
+		DialTimeout: configs.EtcdDialTimeout,
+	})
+	etcd_resolver, err := etcdResolver.NewBuilder(etcdClient)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
+	}
+	fmt.Println(etcd_resolver.Scheme())
+	conn, err := grpc.Dial(fmt.Sprintf("etcd:///%s", configs.UserServerName),
+		grpc.WithResolvers(etcd_resolver),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
+	)
+	if err != nil {
+		log.Fatal("服务端出错，连接不上：", err)
+		return nil
+
 	}
 	return conn
 
