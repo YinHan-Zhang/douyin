@@ -2,8 +2,10 @@ package main
 
 import (
 	"douyin-easy/cmd/user/command"
+	"douyin-easy/pkg/configs"
+	"douyin-easy/pkg/utils"
+	"douyin-easy/pkg/utils/etcd"
 	"fmt"
-	"log"
 	"net"
 	"os"
 
@@ -23,7 +25,6 @@ import (
 var (
 	ServiceName  string
 	ServiceAddr  string
-	EtcdAddress  string
 	Argon2Config *command.Argon2Params
 )
 
@@ -60,21 +61,34 @@ func Init(v *viper.Viper) {
 	}
 	ServiceName = v.GetString("Server.Name")
 	ServiceAddr = fmt.Sprintf("%s:%d", v.GetString("Server.Address"), v.GetInt("Server.Port"))
-	EtcdAddress = fmt.Sprintf("%s:%d", v.GetString("Etcd.Address"), v.GetInt("Etcd.Port"))
 }
 
 // User RPC Server 端运行
 func main() {
 	var v = InitConfig()
 	Init(v)
-	svr := newServer()
-	grpclog.Info("Running user grpc server...")
-	//开启监听
-	listen, err := net.Listen("tcp", ":1234")
+	fmt.Println("main started...")
+
+	//注册服务
+	etcdClient, err := etcd.Register(configs.UserServerName, ServiceAddr)
 	if err != nil {
-		log.Fatal(err)
+		grpclog.Fatal(err)
+		fmt.Println(err)
 	}
-	log.Println("server started...")
+	utils.DealSignal(func() {
+		// 注销注册
+		_ = etcd.Unregister(etcdClient, configs.UserServerName, ServiceAddr)
+	})
+	//log.Println("server started...")
+	fmt.Println("server started...")
+	//开启监听
+	listen, err := net.Listen(configs.TCP, ServiceAddr)
+	if err != nil {
+		panic(err)
+	}
+	svr := newServer()
+	//grpclog.Info("Running user grpc server...")
+	fmt.Println("Running user grpc server...")
 	err = svr.Serve(listen)
 	if err != nil {
 		grpclog.Fatal("User grpc server start failed: ", err)
