@@ -1,9 +1,10 @@
 syntax = "proto3";
 
-package favorite;
-import "appname_rpc.proto";
+package video;
 
-option go_package = "../grpc_gen/favorite;favorite";
+import "idl/rpc.proto";
+
+option go_package = "douyin-easy/grpc_gen/favorite;favorite";
 
 message Favorite {
   int64 id = 1;
@@ -44,3 +45,5 @@ service FavoriteManagement {
 
   rpc QueryFavorites(QueryFavoritesRequest) returns (QueryFavoritesResponse) {}
 }
+
+

@@ -5,12 +5,6 @@ import (
 	"time"
 )
 
-/*
-@Author: 71made
-@Date: 2023/02/15 12:18
-@ProductName: resp.go
-@Description:
-*/
 func NewErrorResponse(err error) *rpc.BaseResponse {
 	return NewResponse(rpc.Status_Error, err.Error())
 }

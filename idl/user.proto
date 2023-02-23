@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package user;
 
 import "idl/rpc.proto";
@@ -9,12 +10,14 @@ message User {
   int64 id = 1; // 用户id
   string name = 2; // 用户名称
   string avatar = 3; // 用户头像
-  int64 video_count = 4; // 用户视频发布数
-  int64 favorite_count = 5; // 用户点赞喜欢视频数
-  int64 follow_count = 6; // 关注总数
-  string background_image = 7; //用户个人页顶部大图
-  string signature = 8; //个人简介
-  
+  string background_image = 4; // 用户个人页面顶部背景图
+  string signature = 5; // 个人简介
+  int64 total_favorite_count = 6; // 用户总获赞数
+  int64 video_count = 7; // 用户视频发布数
+  int64 favorite_count = 8; // 用户点赞喜欢视频数
+  int64 follow_count = 9; // 关注总数
+  int64 follower_count = 10; // 粉丝总数
+
 }
 
 message CheckLoginUserRequest {

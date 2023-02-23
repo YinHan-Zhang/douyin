@@ -101,5 +101,3 @@ func (fms FavoriteManagementServer) QueryFavorites(ctx context.Context, request 
 	}
 
 }
-func (fms FavoriteManagementServer) mustEmbedUnimplementedFavoriteManagementServer() {
-}

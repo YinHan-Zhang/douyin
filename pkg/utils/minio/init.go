@@ -2,9 +2,9 @@ package minio
 
 import (
 	"context"
+	"douyin-easy/pkg/configs"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	"simple-main/http-rcp/pkg/configs"
 )
 
 /*

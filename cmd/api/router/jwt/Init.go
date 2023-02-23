@@ -3,9 +3,12 @@ package jwt
 import (
 	"context"
 	"douyin-easy/cmd/api/biz"
+	handler "douyin-easy/cmd/api/biz/handler/core"
+	service "douyin-easy/cmd/api/biz/service/core"
 	"douyin-easy/pkg/configs"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/hertz-contrib/jwt"
+	"net/http"
 	"sync"
 	"time"
 )
@@ -32,7 +35,7 @@ func Init() {
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
 			claims := jwt.ExtractClaims(ctx, c)
 			return &biz.User{
-				Id: int64(claims[configs.IdentityKey].(float64)),
+				BaseUser: &biz.BaseUser{Id: int64(claims[configs.IdentityKey].(float64))},
 			}
 		},
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
@@ -44,26 +47,26 @@ func Init() {
 			return jwt.MapClaims{}
 		},
 		Authenticator: func(ctx context.Context, c *app.RequestContext) (interface{}, error) {
-			//handler.UserLogin(ctx, c)
-			//resp, found := c.Get("resp")
-			//loginResp := resp.(*service.UserLoginResponse)
-			//if found && loginResp.StatusCode == 0 {
-			//	return loginResp.UserId, nil
-			//}
+			handler.UserLogin(ctx, c)
+			resp, found := c.Get("resp")
+			loginResp := resp.(*service.UserLoginResponse)
+			if found && loginResp.StatusCode == biz.SuccessCode {
+				return loginResp.UserId, nil
+			}
 			return nil, jwt.ErrFailedAuthentication
 		},
 		LoginResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
-			//status, _ := c.Get("status")
-			//if status == nil {
-			//	status = http.StatusOK
-			//}
-			//
-			//resp, found := c.Get("resp")
-			//loginResp := resp.(*service.UserLoginResponse)
-			//if found && loginResp.StatusCode == 0 {
-			//	loginResp.Token = token
-			//}
-			//c.JSON(status.(int), loginResp)
+			status, _ := c.Get("status")
+			if status == nil {
+				status = http.StatusOK
+			}
+
+			resp, found := c.Get("resp")
+			loginResp := resp.(*service.UserLoginResponse)
+			if found && loginResp.StatusCode == 0 {
+				loginResp.Token = token
+			}
+			c.JSON(status.(int), loginResp)
 		},
 		Unauthorized: func(ctx context.Context, c *app.RequestContext, code int, message string) {
 			status, _ := c.Get("status")

@@ -2,6 +2,7 @@ package dal
 
 import (
 	"context"
+	"douyin-easy/pkg/configs"
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
@@ -53,7 +54,7 @@ func (f *Favorite) BeforeCreate(tx *gorm.DB) (err error) {
 	if err1 != nil {
 		return err1
 	}
-	err2 := f.syncUpdateTotalFavorited(tx, gorm.Expr("total_favorited + 1"))
+	err2 := f.syncUpdateTotalFavoriteCount(tx, gorm.Expr("total_favorited + 1"))
 	if err2 != nil {
 		return err2
 	}
@@ -76,7 +77,7 @@ func (f *Favorite) BeforeUpdate(tx *gorm.DB) (err error) {
 	if err1 != nil {
 		return err1
 	}
-	err2 := f.syncUpdateTotalFavorited(tx, expr_u)
+	err2 := f.syncUpdateTotalFavoriteCount(tx, expr_u)
 	if err2 != nil {
 		return err2
 	}
@@ -101,11 +102,10 @@ func (f *Favorite) syncUpdateFavoriteCount(tx *gorm.DB, expr clause.Expr) (err e
 	return nil
 }
 
-func (f *Favorite) syncUpdateTotalFavorited(tx *gorm.DB, expr clause.Expr) (err error) {
+func (f *Favorite) syncUpdateTotalFavoriteCount(tx *gorm.DB, expr clause.Expr) (err error) {
 	ctx := tx.Statement.Context
-	favorited_userId, err := QueryUserIdByVideoId(ctx, f.VideoId)
-	fmt.Println(favorited_userId)
-	updateRes := tx.Model(&User{}).Where("id = ?", favorited_userId).
+	userId, err := QueryUserIdByVideoId(ctx, f.VideoId)
+	updateRes := tx.Table(configs.UserTable).Where("id = ?", userId).
 		Update("total_favorited", expr)
 	if err = updateRes.Error; err != nil {
 		return err

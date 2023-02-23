@@ -8,23 +8,24 @@ import "time"
  @ProductName: etcd.go
  @Description:
 */
-const TCP = "tcp"
+
 const Etcd = "etcd"
 const HTTP = "http"
 const EtcdPort = ":2379"
-
-// const EtcdURL = ServerAddrPrefix + EtcdPort
 const EtcdURL = ServerAddrPrefix + EtcdPort
 const EtcdDialTimeout = 5 * time.Second
 const EtcdTTL = 10
-const ServerIP = "127.0.0.1"
+
 const (
-	ServerNamePrefix = "douyin"
+	ServerNamePrefix = "douyin/"
 	ServerAddrPrefix = HTTP + "://" + ServerIP
 )
-const UserServer = "UserServer"
-const VideoServer = "VideoServer"
+
 const (
-	UserServerName  = ServerNamePrefix + "/" + UserServer
-	VideoServerName = ServerNamePrefix + "/" + VideoServer
+	UserServerName     = ServerNamePrefix + UserServer
+	VideoServerName    = ServerNamePrefix + VideoServer
+	FavoriteServerName = ServerNamePrefix + FavoriteServer
+	CommentServerName  = ServerNamePrefix + CommentServer
+	RelationServerName = ServerNamePrefix + RelationServer
+	MessageServerName  = ServerNamePrefix + MessagesServer
 )
