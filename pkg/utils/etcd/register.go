@@ -2,7 +2,9 @@ package etcd
 
 import (
 	"context"
+	"douyin-easy/pkg/configs"
 	"fmt"
+
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/naming/endpoints"
 )
@@ -19,16 +21,19 @@ func Register(serverName, addr string) (*clientv3.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	em, err := endpoints.NewManager(client, serverName)
 	if err != nil {
 		return nil, err
 	}
 	// 创建租约
-	lease, _ := client.Grant(context.TODO(), 10)
+	lease, err := client.Grant(context.TODO(), configs.EtcdTTL)
+	if err != nil {
+		return nil, err
+	}
 	// 挂载服务节点
 	err = em.AddEndpoint(context.TODO(), fmt.Sprintf("%s/%s", serverName, addr),
 		endpoints.Endpoint{Addr: addr}, clientv3.WithLease(lease.ID))
+
 	if err != nil {
 		return nil, err
 	}
@@ -44,5 +49,6 @@ func Register(serverName, addr string) (*clientv3.Client, error) {
 		}
 
 	}()
+
 	return client, nil
 }

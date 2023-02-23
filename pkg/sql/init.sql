@@ -7,13 +7,15 @@ CREATE TABLE `user`
     `favorite_count` bigint NOT NULL DEFAULT 0 COMMENT 'User favorite video count',
     `follow_count`   bigint NOT NULL DEFAULT 0 COMMENT 'User follow count',
     `follower_count` bigint NOT NULL DEFAULT 0 COMMENT 'User follower count',
+    `avatar`         varchar(128) NOT NULL DEFAULT '' COMMENT 'User Avatar',
+    `background_image`varchar(128) NOT NULL DEFAULT '' COMMENT 'User BackgroundImage',
+    `signature`      varchar(128) NOT NULL DEFAULT '' COMMENT 'User Signature',
     `created_at`     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'User account create time',
     `updated_at`     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'User account update time',
     `deleted_at`     timestamp NULL DEFAULT NULL COMMENT 'User account delete time',
     PRIMARY KEY (`id`),
     KEY              `idx_username` (`username`) COMMENT 'Username index'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='User account table';
-
 
 CREATE TABLE `user_video`
 (

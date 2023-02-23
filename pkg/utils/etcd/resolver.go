@@ -1,10 +1,11 @@
 package etcd
 
 import (
+	"douyin-easy/pkg/configs"
+
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/naming/resolver"
 	gresolver "google.golang.org/grpc/resolver"
-	"time"
 )
 
 /*
@@ -16,8 +17,8 @@ import (
 
 func NewClient() (client *clientv3.Client, err error) {
 	client, err = clientv3.New(clientv3.Config{
-		Endpoints:   []string{"http://127.0.0.1:2379"},
-		DialTimeout: 5 * time.Second,
+		Endpoints:   []string{configs.EtcdURL},
+		DialTimeout: configs.EtcdDialTimeout,
 	})
 	return
 }
